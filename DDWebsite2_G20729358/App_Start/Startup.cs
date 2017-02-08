@@ -5,7 +5,8 @@ using System.Web;
 using Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DDWebsite2_G20729358.App_Start
 {
@@ -19,6 +20,14 @@ namespace DDWebsite2_G20729358.App_Start
                 LoginPath = new PathString("/Users/Login")
             });
         }
+
+
+        public void ConfigureServices(ServiceCollection services)
+        {
+            services.AddMemoryCache();
+       
+        }
+
 
     }
 }

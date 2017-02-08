@@ -16,6 +16,7 @@ namespace DDWebsite2_G20729358.Controllers
         private Database1Entities1 db = new Database1Entities1();
 
         // GET: Games
+        [OutputCache(Duration = 30, VaryByParam = "none", Location = System.Web.UI.OutputCacheLocation.Server)]
         public ActionResult Index(string searchString, string developer)
         {
             var games = from g in db.Games select g;

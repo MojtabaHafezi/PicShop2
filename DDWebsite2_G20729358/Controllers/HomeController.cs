@@ -12,6 +12,8 @@ namespace DDWebsite2_G20729358.Controllers
     [AllowAnonymous]
     public class HomeController : Controller
     {
+       
+
         public ActionResult Index()
         {
 
