@@ -12,14 +12,14 @@ namespace DDWebsite2_G20729358.Controllers
     [AllowAnonymous]
     public class HomeController : Controller
     {
-       
-
+        // caches for 5min
+      
         public ActionResult Index()
         {
 
             return View();
         }
-
+        [OutputCache(Duration = 300, VaryByParam = "none", Location = System.Web.UI.OutputCacheLocation.Server)]
         public ActionResult About()
         {
            
@@ -27,7 +27,7 @@ namespace DDWebsite2_G20729358.Controllers
            
             return View();
         }
-
+        [OutputCache(Duration = 300, VaryByParam = "none", Location = System.Web.UI.OutputCacheLocation.Server)]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

@@ -12,13 +12,14 @@ namespace DDWebsite2_G20729358.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+
     public partial class User
     {
-      
-
         public int Id { get; set; }
         [StringLength(25, MinimumLength = 3)]
         [Required]
+        [Index(IsUnique = true)]
         public string Username { get; set; }
         [StringLength(25, MinimumLength = 0)]
 

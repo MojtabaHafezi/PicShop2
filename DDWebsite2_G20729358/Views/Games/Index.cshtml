@@ -7,7 +7,13 @@
 <h2>Index</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @{
+        if (User.IsInRole("ADMIN") || User.IsInRole("EMPLOYEE"))
+        {
+            @Html.ActionLink("Create new game entry", "Create")
+        }
+    }
+   
 
     @using (Html.BeginForm())
     {
@@ -64,16 +70,30 @@
             @Html.DisplayFor(modelItem => item.Price)
         </td>
         <td>
+            @*  --------------
+             USING USER.ISINROLE instead -> security - prevents session hijacking
+    @{
+        if ((string)Session["UserRole"] == "ADMIN" || (string)Session["UserRole"] == "EMPLOYEE")
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id });
+        };
+    }           ------------------- *@
+
+
             @{
-                if ((string)Session["UserRole"] == "ADMIN" || (string)Session["UserRole"] == "EMPLOYEE")
+                if (User.IsInRole("ADMIN") || User.IsInRole("EMPLOYEE"))
                 {
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id });
-                };
+                    @Html.ActionLink("Edit ", "Edit", new { id = item.Id })
+
+                    @Html.ActionLink("Delete ", "Delete", new { id = item.Id });
+                }
             }
 
+
+
+
             @Html.ActionLink("Details", "Details", new { id=item.Id }) 
-          
         </td>
     </tr>
 }

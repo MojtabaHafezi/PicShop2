@@ -44,22 +44,6 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.ConfirmPassword)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ConfirmPassword)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.UserRole)
         </dt>
 
@@ -73,8 +57,16 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+
+            @{
+                if (User.IsInRole("ADMIN"))
+                {
+                    <input type="submit" value="Delete" class="btn btn-default" /> 
+                }
+            }
+
+            
+           | @Html.ActionLink("Back to List", "Index")
         </div>
     }
 </div>

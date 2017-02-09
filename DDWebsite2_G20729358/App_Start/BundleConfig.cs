@@ -14,6 +14,7 @@ namespace DDWebsite2_G20729358
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
+
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
@@ -21,10 +22,15 @@ namespace DDWebsite2_G20729358
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js",
+                      "~/Scripts/bootstrap.min.js",
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/bootstrap.min.css",
+                      "~/Content/font-awesome.min.css",
+                      "~/Content/modern-business.css",
+                       "~/Content/footer-basic-centered.css",
                       "~/Content/site.css"));
         }
     }

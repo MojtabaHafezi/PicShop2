@@ -16,7 +16,7 @@ namespace DDWebsite2_G20729358.Controllers
         private Database1Entities1 db = new Database1Entities1();
 
         // GET: Games
-        [OutputCache(Duration = 30, VaryByParam = "none", Location = System.Web.UI.OutputCacheLocation.Server)]
+       
         public ActionResult Index(string searchString, string developer)
         {
             var games = from g in db.Games select g;
@@ -48,8 +48,8 @@ namespace DDWebsite2_G20729358.Controllers
             return View(game);
         }
 
-        [Authorize]
-        // GET: Games/Register
+        // GET: Games/Create
+        [Authorize(Roles ="ADMIN,EMPLOYEE")]
         public ActionResult Create()
         {
             return View();
@@ -60,6 +60,7 @@ namespace DDWebsite2_G20729358.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN,EMPLOYEE")]
         public ActionResult Create([Bind(Include = "Id,Title,Description,Developer,Publisher,Genre,Release,Price")] Game game)
         {
             if (ModelState.IsValid)
@@ -71,7 +72,7 @@ namespace DDWebsite2_G20729358.Controllers
 
             return View(game);
         }
-
+        [Authorize(Roles = "ADMIN,EMPLOYEE")]
         // GET: Games/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -88,10 +89,9 @@ namespace DDWebsite2_G20729358.Controllers
         }
 
         // POST: Games/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN,EMPLOYEE")]
         public ActionResult Edit([Bind(Include = "Id,Title,Description,Developer,Publisher,Release,Price")] Game game)
         {
             if (ModelState.IsValid)
@@ -103,6 +103,7 @@ namespace DDWebsite2_G20729358.Controllers
             return View(game);
         }
 
+        [Authorize(Roles = "ADMIN,EMPLOYEE")]
         // GET: Games/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -121,6 +122,7 @@ namespace DDWebsite2_G20729358.Controllers
         // POST: Games/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN,EMPLOYEE")]
         public ActionResult DeleteConfirmed(int id)
         {
             Game game = db.Games.Find(id);

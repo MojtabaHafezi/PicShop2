@@ -26,6 +26,7 @@ namespace DDWebsite2_G20729358.Controllers
             return View(db.Users.ToList());
         }
 
+        [Authorize(Roles = "ADMIN")]
         // GET: Users/Details/5
         public ActionResult Details(int? id)
         {
@@ -59,6 +60,10 @@ namespace DDWebsite2_G20729358.Controllers
         {
             if (String.IsNullOrEmpty(user.UserRole))
                 user.UserRole = UserRole.USER.ToString();
+
+            if (!Available(user.Username))
+                ModelState.AddModelError("", "Username is not available");
+
             if (ModelState.IsValid)
             {
                 //Using BCrypt Password hashing + salting
@@ -72,7 +77,7 @@ namespace DDWebsite2_G20729358.Controllers
 
             return View(user);
         }
-
+        [Authorize]
         // GET: Users/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -85,13 +90,18 @@ namespace DDWebsite2_G20729358.Controllers
             {
                 return HttpNotFound();
             }
+            user.Password = user.ConfirmPassword = "";
+            if(User.IsInRole("ADMIN") || User.Identity.Name.ToLower().Equals(user.Username.ToLower()))
             return View(user);
+            else
+                return RedirectToAction("Index", "Home");
         }
 
         // POST: Users/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Username,Firstname,Lastname,Email,Password,ConfirmPassword,UserRole")] User user)
         {
@@ -100,15 +110,22 @@ namespace DDWebsite2_G20729358.Controllers
             RoleList.AddRange(Enum.GetNames(typeof(UserRole)).ToList());  
             ViewBag.listOfRoles = new SelectList(RoleList);
 
-            if (ModelState.IsValid)
+            if (!user.Password.Equals(user.ConfirmPassword))
+                ModelState.AddModelError("","Passwords do not match");
+
+                if (ModelState.IsValid )
             {
+                //Using BCrypt Password hashing + salting
+                string hashed = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                user.Password = user.ConfirmPassword = hashed;
+
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
             return View(user);
         }
-
+        [Authorize]
         // GET: Users/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -121,15 +138,21 @@ namespace DDWebsite2_G20729358.Controllers
             {
                 return HttpNotFound();
             }
-            return View(user);
+            if (User.IsInRole("ADMIN") || User.Identity.Name.ToLower().Equals(user.Username.ToLower()))
+                return View(user);
+            else
+                return RedirectToAction("Index", "Home");
+          
         }
 
         // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             User user = db.Users.Find(id);
+
             db.Users.Remove(user);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -140,10 +163,10 @@ namespace DDWebsite2_G20729358.Controllers
             Session.Clear();
             var ctx = Request.GetOwinContext();
             var authManager = ctx.Authentication;
-
             authManager.SignOut("ApplicationCookie");
-            // FormsAuthentication.SignOut();
-            return RedirectToAction("Index", "Games");
+            FormsAuthentication.SignOut();
+
+            return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]
         public ActionResult Login()
@@ -168,6 +191,7 @@ namespace DDWebsite2_G20729358.Controllers
                     new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider", "ASP.NET Identity", "http://www.w3.org/2001/XMLSchema#string"),
                     new Claim(ClaimTypes.Name, compareUser.Username.ToString()),
                     new Claim(ClaimTypes.Role, compareUser.UserRole.ToString()),
+                    new Claim(ClaimTypes.Sid, compareUser.Id.ToString()),
                 },"ApplicationCookie");
 
                 var ctx = Request.GetOwinContext();
@@ -195,15 +219,38 @@ namespace DDWebsite2_G20729358.Controllers
             base.Dispose(disposing);
         }
 
-        public User IsValid(String username, String password)
+        private User IsValid(String username, String password)
         {
-            
-            var compareUser = db.Users.Where(u => u.Username == username).FirstOrDefault();
-           bool matches = BCrypt.Net.BCrypt.Verify(password, compareUser.Password);
+            bool matches;
+            var compareUser = db.Users.Where(u => u.Username == username).First();
+            if (compareUser == null)
+                return null;
+            try
+            {
+                 matches = BCrypt.Net.BCrypt.Verify(password, compareUser.Password);
+            } 
+            catch(Exception e)
+            {
+                matches = false;
+            }
+        
            if (matches)
             return compareUser;
             else
             return null;
+        }
+
+        private bool Available(String username)
+        {
+            var usernames = from u in db.Users select u;
+
+            if (!String.IsNullOrEmpty(username))
+            {
+                usernames = usernames.Where(s => s.Username.ToLower().Equals(username.ToLower()));
+                if (usernames.Count() == 0)
+                    return true;
+            }
+            return false;
         }
     }
 }

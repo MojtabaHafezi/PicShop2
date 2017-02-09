@@ -6,53 +6,77 @@
     <title>@ViewBag.Title - DDWA2</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href='http://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+   
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
                 @Html.ActionLink("DDWA2", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Games", "Index", "Games")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    @{
+                        if (User.IsInRole("ADMIN"))
+                        {
+                            <li>@Html.ActionLink("Users", "Index", "Users")</li>
+                        }
+                    }
 
                     @{if (@User.Identity.IsAuthenticated)
                         {
                             <li>@Html.ActionLink("Logout", "Logout", "Users") </li>
-                        @Html.ActionLink("Hello " + @User.Identity.Name + "!", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-                    }
-                    else
-                    {
-                        @Html.ActionLink("Login", "Login", "Users", new { area = "" }, new { @class = "navbar-brand" })
-                    }}
 
-
-
-
-                  @* not needed anymore, as identity is used with AuthorizedAttribute
-              @{ if(Session["UserRole"] != null) {
-                <li>@Html.ActionLink("Logout","Logout","Users") </li>
-        };}
-                  *@
-                  
+                            <li> @Html.ActionLink("Hello " + @User.Identity.Name + "!", "Edit/" + Session["UserID"], "Users")</li>
+                        }
+                        else
+                        {
+                            <li>  @Html.ActionLink("Login", "Login", "Users") </li>
+                        }}
                 </ul>
             </div>
+            <!-- /.navbar-collapse -->
         </div>
-    </div>
+        <!-- /.container -->
+    </nav>
+
+
+
     <div class="container body-content">
         @RenderBody()
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - DDWA2 - Mojtaba Hafezi</p>
+
+
+        <footer class="footer-basic-centered">
+            <p class="footer-company-motto">DDW Demo</p>
+            <p class="footer-links">
+                @Html.ActionLink("Home", "Index", "Home")
+                ·
+                @Html.ActionLink("Games", "Index", "Games")
+                ·
+               @Html.ActionLink("About", "About", "Home")
+                ·
+                @Html.ActionLink("Contact", "Contact", "Home")
+            </p>
+            
+            <p class="footer-company-name">Mojtaba Hafezi - DDW &copy; 2017</p>
         </footer>
+      
     </div>
 
     @Scripts.Render("~/bundles/jquery")
