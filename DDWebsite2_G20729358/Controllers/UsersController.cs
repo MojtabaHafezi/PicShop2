@@ -46,6 +46,7 @@ namespace DDWebsite2_G20729358.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+           
             return View();
         }
 
@@ -58,6 +59,7 @@ namespace DDWebsite2_G20729358.Controllers
 
         public ActionResult Register([Bind(Include = "Id,Username,Firstname,Lastname,Email,Password,ConfirmPassword,UserRole")] User user)
         {
+ 
             if (String.IsNullOrEmpty(user.UserRole))
                 user.UserRole = UserRole.USER.ToString();
 
@@ -91,6 +93,7 @@ namespace DDWebsite2_G20729358.Controllers
                 return HttpNotFound();
             }
             user.Password = user.ConfirmPassword = "";
+            // Additional security condition-> only admins can change data or user on his own profile
             if(User.IsInRole("ADMIN") || User.Identity.Name.ToLower().Equals(user.Username.ToLower()))
             return View(user);
             else
@@ -105,10 +108,6 @@ namespace DDWebsite2_G20729358.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Username,Firstname,Lastname,Email,Password,ConfirmPassword,UserRole")] User user)
         {
-            var RoleList = new List<string>();
-            // add the roles as a list of string
-            RoleList.AddRange(Enum.GetNames(typeof(UserRole)).ToList());  
-            ViewBag.listOfRoles = new SelectList(RoleList);
 
             if (!user.Password.Equals(user.ConfirmPassword))
                 ModelState.AddModelError("","Passwords do not match");
@@ -173,6 +172,7 @@ namespace DDWebsite2_G20729358.Controllers
         {
             return View();
         }
+
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -188,7 +188,8 @@ namespace DDWebsite2_G20729358.Controllers
 
                 var identity = new ClaimsIdentity(new[] {
                     new Claim(ClaimTypes.NameIdentifier, compareUser.Username.ToString()),
-                    new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider", "ASP.NET Identity", "http://www.w3.org/2001/XMLSchema#string"),
+                    new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider",
+                    "ASP.NET Identity", "http://www.w3.org/2001/XMLSchema#string"),
                     new Claim(ClaimTypes.Name, compareUser.Username.ToString()),
                     new Claim(ClaimTypes.Role, compareUser.UserRole.ToString()),
                     new Claim(ClaimTypes.Sid, compareUser.Id.ToString()),
@@ -221,8 +222,18 @@ namespace DDWebsite2_G20729358.Controllers
 
         private User IsValid(String username, String password)
         {
+            User compareUser;
             bool matches;
-            var compareUser = db.Users.Where(u => u.Username == username).First();
+            try
+            {
+                 compareUser = db.Users.Where(u => u.Username == username).First();
+
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+            
             if (compareUser == null)
                 return null;
             try

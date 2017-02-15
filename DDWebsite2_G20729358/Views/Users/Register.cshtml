@@ -62,8 +62,20 @@
                 @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
             </div>
         </div>
-        @{if ((string)Session["UserRole"] == "ADMIN")
+        @{if (User.IsInRole("ADMIN"))
             {
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.UserRole, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EnumDropDownListFor(model => model.UserRole, "Select", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.UserRole, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+
+
         <div class="form-group">
             @Html.LabelFor(model => model.UserRole, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
